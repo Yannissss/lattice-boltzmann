@@ -9,7 +9,7 @@ Base coursework for the Advanced High Performance Computing class.
 
 To compile type `make`. Editing the values for `CC` and `CFLAGS` in the Makefile can be used to enable different compiler options or use a different compiler. These can also be passed on the command line:
 
-    $ make CFLAGS="-O3 -fopenmp -DDEBUG"
+    $ make CFLAGS="-O3 -fopenmp" CPPFLAGS="-DNDEBUG"
 
 Input parameter and obstacle files are all specified on the command line of the `d2q9-bgk` executable.
 
