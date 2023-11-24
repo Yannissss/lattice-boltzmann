@@ -1,4 +1,4 @@
-# HPC Coursework
+# HPC Coursework (University of Bristol)
 
 Base coursework for the Advanced High Performance Computing class.
 
@@ -22,7 +22,7 @@ eg:
 
 ## Checking results
 
-An automated result checking function is provided that requires you to load a particular Python module (`module load languages/anaconda2/5.0.1`). Running `make check` will check the output file (average velocities and final state) against some reference results. By default, it should look something like this:
+An automated result checking function is provided. Running `make check` will check the output file (average velocities and final state) against some reference results. By default, it should look something like this:
 
     $ make check
     python check/check.py --ref-av-vels-file=check/128x128.av_vels.dat --ref-final-state-file=check/128x128.final_state.dat --av-vels-file=./av_vels.dat --final-state-file=./final_state.dat
@@ -50,16 +50,16 @@ All the options for this script can be examined by passing the --help flag to it
     ...
 
 
-## Running on BlueCrystal Phase 4
+## Running on ROMEO
 
-When you wish to submit a job to the queuing system on BlueCrystal, you should use the job submission script provided.
+When you wish to submit a job to the queuing system on ROMEO, you should use the job submission script provided.
 
     $ sbatch job_submit_d2q9-bgk
 
 This will dispatch a job to the queue, which you can monitor using the
 `squeue` command:
 
-    $ squeue -u $USER
+    $ squeue --me
 
 When finished, the output from your job will be in a file called
 `d2q9-bgk.out`:
@@ -89,7 +89,7 @@ Note that `check_submission.sh` does _not_ run your code, and so you _cannot_ ve
 
 
 # Serial output for sample inputs
-Run times were taken on a Phase 4 node using the base (gcc) compiler and base compiler flags as found in the Makefile:
+Run times were taken on a BlueCrystal Phase 4 node using the base (gcc) compiler and base compiler flags as found in the Makefile:
 
 - 128x128
 ```
