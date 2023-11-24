@@ -58,6 +58,7 @@
 
 #define NSPEEDS         9
 #define FINALSTATEFILE  "final_state.dat"
+#define INITIALSTATEFILE  "initial_state.dat"
 #define AVVELSFILE      "av_vels.dat"
 
 /* struct to hold the parameter values */
@@ -149,6 +150,9 @@ int main(int argc, char* argv[])
   tot_tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
   init_tic=tot_tic;
   initialise(paramfile, obstaclefile, &params, &cells, &tmp_cells, &obstacles, &av_vels);
+#ifdef DEBUG
+  write_values(params, cells, obstacles, av_vels);
+#endif
 
   /* Init time stops here, compute time starts*/
   gettimeofday(&timstr, NULL);
@@ -164,6 +168,7 @@ int main(int argc, char* argv[])
     printf("av velocity: %.12E\n", av_vels[tt]);
     printf("tot density: %.12E\n", total_density(params, cells));
 #endif
+  /** Echange des données */
   }
   
   /* Compute time stops here, collate time starts*/
@@ -656,7 +661,15 @@ int write_values(const t_param params, t_speed* cells, int* obstacles, float* av
   float u_y;                   /* y-component of velocity in grid cell */
   float u;                     /* norm--root of summed squares--of u_x and u_y */
 
-  fp = fopen(FINALSTATEFILE, "w");
+#ifdef DEBUG
+  /* Hack degueux pour créer une image initiale si build en mode debug */
+  static int is_final = 0;
+  if (!is_final) {
+	  fp = fopen(INITIALSTATEFILE, "w");
+	  is_final = !is_final;
+  } else
+#endif
+	  fp = fopen(FINALSTATEFILE, "w");
 
   if (fp == NULL)
   {
