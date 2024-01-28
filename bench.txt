@@ -1,2 +1,3 @@
 revision, params, time, comments
 orig, 128x128, 23.673115, Original version ; no changes
+inline, 128x128, ???, inline ; constexpr some stuff ; refactoring
