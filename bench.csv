@@ -4,4 +4,4 @@
 // Analyse : Weak vs Strong scaling
 revision, params, time, comments
 orig, 128x128, 23.673115, Original version ; no changes
-inline, 128x128, ???, inline ; constexpr some stuff ; refactoring
+inline, 128x128, 23.789407, inline ; constexpr some stuff ; refactoring ; no results
