@@ -73,7 +73,7 @@ int initialise(const char *paramfile, const char *obstaclefile, t_param *params,
                t_speed *cells_ptr, t_speed *tmp_cells_ptr, int **obstacles_ptr,
                float **av_vels_ptr);
 
-int write_values(const t_param params, t_speed *cells, int *obstacles,
+int write_values(const t_param params, t_speed cells, int *obstacles,
                  float *av_vels);
 
 /* finalise, including freeing up allocated memory */

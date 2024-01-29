@@ -16,7 +16,7 @@ float total_density(const t_param params, t_speed cells)
     {
         for (int ii = 0; ii < params.nx; ii++)
         {
-#pragma loop unroll
+#pragma unroll
             for (int kk = 0; kk < NSPEEDS; kk++)
             {
                 total += cells.speeds[kk][ii + jj * params.nx];
