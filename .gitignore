@@ -9,3 +9,4 @@ final_state.plt
 gmon.out
 initial_state.dat
 perf.*
+perf-dumps/**

@@ -2,6 +2,11 @@
 // Analyse : Vectorisation
 // Analyse : Etude du speedup le long du projet
 // Analyse : Weak vs Strong scaling
+// MAQAO   :
+// module load maqao
+// maqao OV -R1 -xp=perf-dumps/rev-<rev> -- ./d2q9-bgk.llvm  input_128x128.params obstacles_128x128.dat
+// maqao OV -R1 -xp=perf-dumps/rev-refa -- ./d2q9-bgk.llvm  input_128x128.params obstacles_128x128.dat
 revision, params, time, comments
 orig, 128x128, 23.673115, Original version ; no changes
-refact, 128x128, 23.789407, inline ; constexpr some stuff ; refactoring ; AoS => SoA to allow vectorization
+refa, 128x128, 14.027232, inline ; constexpr some stuff ; loop unrolling 
+vect, 128x128, 0.0, AoS => SoA to allow vectorization
