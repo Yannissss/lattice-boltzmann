@@ -10,12 +10,19 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS  := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CXX       = clang
 CPPFLAGS  = $(INC_FLAGS) -MMD -MP
 CPPFLAGS += -DNDEBUG
 CPPFLAGS += -std=c++2b -Wall -g
-CPPFLAGS += -O3 -march=native
-CPPFLAGS += --gcc-toolchain=/apps/2021/gcc/10.2/
+
+# Clang setup
+# CXX       = clang
+# CPPFLAGS += -O3 -march=native -mavx512f
+# CPPFLAGS += --gcc-toolchain=/apps/2021/gcc/10.2/
+
+# Intel setup
+CXX       = icpx
+CPPFLAGS += -O3 -march=native -mavx512f
+
 LDFLAGS   = -lm
 
 FINAL_STATE_FILE      = ./final_state.dat
