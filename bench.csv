@@ -5,9 +5,13 @@
 // MAQAO   :
 // module load maqao
 // maqao OV -R1 -xp=perf-dumps/rev-<rev> -- ./d2q9-bgk.llvm  input_128x128.params obstacles_128x128.dat
+// maqao OV -R1 -xp=perf-dumps/rev-base -- ./d2q9-bgk.llvm  input_128x128.params obstacles_128x128.dat
 // maqao OV -R1 -xp=perf-dumps/rev-refa -- ./d2q9-bgk.llvm  input_128x128.params obstacles_128x128.dat
 // maqao OV -R1 -xp=perf-dumps/rev-vect -- ./d2q9-bgk.llvm  input_128x128.params obstacles_128x128.dat
+// maqao OV -R1 -xp=perf-dumps/rev-av -- ./d2q9-bgk.llvm  input_128x128.params obstacles_128x128.dat
 revision, params, time, comments
 orig, 128x128, 23.673115, Original version ; no changes
+base, 128x128, 13.589240, Makefile modification : -march=native
+av, 128x128, ??, timestep inline ; av_velocity vectorization
 refa, 128x128, 14.027232, inline ; constexpr some stuff ; loop unrolling 
 vect, 128x128, 0.0, AoS => SoA to allow vectorization

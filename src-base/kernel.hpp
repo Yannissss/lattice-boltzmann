@@ -40,15 +40,8 @@ int collision(const t_param params, t_speed *cells, t_speed *tmp_cells,
 int write_values(const t_param params, t_speed *cells, int *obstacles,
                  float *av_vels);
 
-static inline int timestep(const t_param params, t_speed *cells,
-                           t_speed *tmp_cells, int *obstacles)
-{
-    accelerate_flow(params, cells, obstacles);
-    propagate(params, cells, tmp_cells);
-    rebound(params, cells, tmp_cells, obstacles);
-    collision(params, cells, tmp_cells, obstacles);
-    return EXIT_SUCCESS;
-}
+int timestep(const t_param params, t_speed *cells, t_speed *tmp_cells,
+             int *obstacles);
 
 /* compute average velocity */
 float av_velocity(const t_param params, t_speed *cells, int *obstacles);
