@@ -167,18 +167,23 @@ static inline int collision(const t_param params, t_speed cells,
             if (!obstacles[ii + jj * params.nx])
             {
                 /* compute local density total */
-                float local_density = 0.f;
+                float local_density, acc[9];
 
-                local_density += tmp_cells.speeds[0][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[1][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[2][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[3][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[4][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[5][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[6][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[7][ii + jj * params.nx];
-                local_density += tmp_cells.speeds[8][ii + jj * params.nx];
+                acc[0] += tmp_cells.speeds[0][ii + jj * params.nx];
+                acc[1] += tmp_cells.speeds[1][ii + jj * params.nx];
+                acc[2] += tmp_cells.speeds[2][ii + jj * params.nx];
+                acc[3] += tmp_cells.speeds[3][ii + jj * params.nx];
+                acc[4] += tmp_cells.speeds[4][ii + jj * params.nx];
+                acc[5] += tmp_cells.speeds[5][ii + jj * params.nx];
+                acc[6] += tmp_cells.speeds[6][ii + jj * params.nx];
+                acc[7] += tmp_cells.speeds[7][ii + jj * params.nx];
+                acc[8] += tmp_cells.speeds[8][ii + jj * params.nx];
 
+                acc[0] = acc[0] + acc[1] + acc[2] + acc[3];
+                acc[4] = acc[4] + acc[5] + acc[6] + acc[7];
+                acc[0] = acc[0] + acc[4] + acc[8];
+
+                local_density = acc[0];
                 float inv_local_density = 1.f / local_density;
 
                 /* compute x velocity component */
@@ -332,18 +337,23 @@ static inline float av_velocity(const t_param params, t_speed cells,
             if (!obstacles[ii + jj * params.nx])
             {
                 /* local density total */
-                float local_density = 0.f;
+                float local_density, acc[9];
 
-                local_density += cells.speeds[0][ii + jj * params.nx];
-                local_density += cells.speeds[1][ii + jj * params.nx];
-                local_density += cells.speeds[2][ii + jj * params.nx];
-                local_density += cells.speeds[3][ii + jj * params.nx];
-                local_density += cells.speeds[4][ii + jj * params.nx];
-                local_density += cells.speeds[5][ii + jj * params.nx];
-                local_density += cells.speeds[6][ii + jj * params.nx];
-                local_density += cells.speeds[7][ii + jj * params.nx];
-                local_density += cells.speeds[8][ii + jj * params.nx];
+                acc[0] += cells.speeds[0][ii + jj * params.nx];
+                acc[1] += cells.speeds[1][ii + jj * params.nx];
+                acc[2] += cells.speeds[2][ii + jj * params.nx];
+                acc[3] += cells.speeds[3][ii + jj * params.nx];
+                acc[4] += cells.speeds[4][ii + jj * params.nx];
+                acc[5] += cells.speeds[5][ii + jj * params.nx];
+                acc[6] += cells.speeds[6][ii + jj * params.nx];
+                acc[7] += cells.speeds[7][ii + jj * params.nx];
+                acc[8] += cells.speeds[8][ii + jj * params.nx];
 
+                acc[0] = acc[0] + acc[1] + acc[2] + acc[3];
+                acc[4] = acc[4] + acc[5] + acc[6] + acc[7];
+                acc[0] = acc[0] + acc[4] + acc[8];
+
+                local_density = acc[0];
                 float inv_local_density = 1.f / local_density;
 
                 /* x-component of velocity */
