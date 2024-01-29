@@ -31,14 +31,6 @@ typedef struct
 ** timestep calls, in order, the functions:
 ** accelerate_flow(), propagate(), rebound() & collision()
 */
-static inline int timestep(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
-{
-    accelerate_flow(params, cells, obstacles);
-    propagate(params, cells, tmp_cells);
-    rebound(params, cells, tmp_cells, obstacles);
-    collision(params, cells, tmp_cells, obstacles);
-    return EXIT_SUCCESS;
-}
 
 static inline int accelerate_flow(const t_param params, t_speed *cells, int *obstacles)
 {
@@ -200,6 +192,16 @@ static inline int collision(const t_param params, t_speed *cells, t_speed *tmp_c
 
     return EXIT_SUCCESS;
 }
+
+static inline int timestep(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
+{
+    accelerate_flow(params, cells, obstacles);
+    propagate(params, cells, tmp_cells);
+    rebound(params, cells, tmp_cells, obstacles);
+    collision(params, cells, tmp_cells, obstacles);
+    return EXIT_SUCCESS;
+}
+
 /* compute average velocity */
 static inline float av_velocity(const t_param params, t_speed *cells, int *obstacles)
 {
