@@ -1,6 +1,6 @@
 #include <driver.hpp>
 
-void lattice_boltzmann(t_param const &params, t_speed *cells, t_speed *tmp_cells,
+void lattice_boltzmann(t_param const &params, t_speed cells, t_speed tmp_cells,
                        int *obstacles, float *av_vels)
 {
     for (int tt = 0; tt < params.maxIters; tt++)
