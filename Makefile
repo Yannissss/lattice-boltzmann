@@ -13,7 +13,8 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CXX       = clang
 CPPFLAGS  = $(INC_FLAGS) -MMD -MP
 CPPFLAGS += -DNDEBUG
-CPPFLAGS += -std=c++2b -Wall -O3
+CPPFLAGS += -std=c++2b -Wall
+CPPFLAGS += -O3 -march=native
 CPPFLAGS += --gcc-toolchain=/apps/2021/gcc/10.2/
 LDFLAGS   = -lm
 
