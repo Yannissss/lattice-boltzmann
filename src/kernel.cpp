@@ -4,7 +4,10 @@
 #include <cstdlib>
 #include <cmath>
 
-int timestep(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
+constexpr float ONE_9 = 1.f / 9.f;
+constexpr float ONE_36 = 1.f / 36.f;
+
+static inline int timestep(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
 {
     accelerate_flow(params, cells, obstacles);
     propagate(params, cells, tmp_cells);
@@ -13,11 +16,11 @@ int timestep(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obst
     return EXIT_SUCCESS;
 }
 
-int accelerate_flow(const t_param params, t_speed *cells, int *obstacles)
+static inline int accelerate_flow(const t_param params, t_speed *cells, int *obstacles)
 {
     /* compute weighting factors */
-    float w1 = params.density * params.accel / 9.f;
-    float w2 = params.density * params.accel / 36.f;
+    float w1 = params.density * params.accel * ONE_9;
+    float w2 = params.density * params.accel * ONE_36;
 
     /* modify the 2nd row of the grid */
     int jj = params.ny - 2;
@@ -42,7 +45,7 @@ int accelerate_flow(const t_param params, t_speed *cells, int *obstacles)
     return EXIT_SUCCESS;
 }
 
-int propagate(const t_param params, t_speed *cells, t_speed *tmp_cells)
+static inline int propagate(const t_param params, t_speed *cells, t_speed *tmp_cells)
 {
     /* loop over _all_ cells */
     for (int jj = 0; jj < params.ny; jj++)
@@ -73,7 +76,7 @@ int propagate(const t_param params, t_speed *cells, t_speed *tmp_cells)
     return EXIT_SUCCESS;
 }
 
-int rebound(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
+static inline int rebound(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
 {
     /* loop over the cells in the grid */
     for (int jj = 0; jj < params.ny; jj++)
@@ -100,12 +103,12 @@ int rebound(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obsta
     return EXIT_SUCCESS;
 }
 
-int collision(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
+static inline int collision(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obstacles)
 {
-    const float c_sq = 1.f / 3.f; /* square of speed of sound */
-    const float w0 = 4.f / 9.f;   /* weighting factor */
-    const float w1 = 1.f / 9.f;   /* weighting factor */
-    const float w2 = 1.f / 36.f;  /* weighting factor */
+    constexpr float c_sq = 1.f / 3.f; /* square of speed of sound */
+    constexpr float w0 = 4.f / 9.f;   /* weighting factor */
+    constexpr float w1 = 1.f / 9.f;   /* weighting factor */
+    constexpr float w2 = 1.f / 36.f;  /* weighting factor */
 
     /* loop over the cells in the grid
     ** NB the collision step is called after
@@ -172,7 +175,7 @@ int collision(const t_param params, t_speed *cells, t_speed *tmp_cells, int *obs
     return EXIT_SUCCESS;
 }
 
-float av_velocity(const t_param params, t_speed *cells, int *obstacles)
+static inline float av_velocity(const t_param params, t_speed *cells, int *obstacles)
 {
     int tot_cells = 0; /* no. of cells used in calculation */
     float tot_u;       /* accumulated magnitudes of velocity for each cell */
