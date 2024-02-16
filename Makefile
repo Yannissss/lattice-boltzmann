@@ -23,7 +23,7 @@ CPPFLAGS += -std=c++2b -Wall -g
 CXX       = icpx
 CPPFLAGS += -O3 -fp-model=fast -march=native 
 CPPFLAGS += -mavx512f -mavx512dq -mavx512bw -mprefer-vector-width=512
-# CPPFLAGS += -vec-report
+CPPFLAGS += -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize
 
 LDFLAGS   = -lm
 
