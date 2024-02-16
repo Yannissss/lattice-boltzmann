@@ -16,12 +16,14 @@ CPPFLAGS += -std=c++2b -Wall -g
 
 # Clang setup
 # CXX       = clang
-# CPPFLAGS += -O3 -march=native -mavx512f
+# CPPFLAGS += -O3 -march=native -mavx512f -mavx512f -mavx512dq -mavx512bw
 # CPPFLAGS += --gcc-toolchain=/apps/2021/gcc/10.2/
 
 # Intel setup
 CXX       = icpx
-CPPFLAGS += -O3 -march=native -mavx512f
+CPPFLAGS += -O3 -fp-model=fast -march=native 
+CPPFLAGS += -mavx512f -mavx512dq -mavx512bw -mprefer-vector-width=512
+CPPFLAGS += -vec-report
 
 LDFLAGS   = -lm
 
