@@ -21,7 +21,7 @@ CPPFLAGS += -std=c++2b -Wall -g
 
 # Intel setup
 CXX       = icpx
-CPPFLAGS += -O3 -fp-model=fast -march=native 
+CPPFLAGS += -O3 -fp-model=fast -march=native -fno-strict-aliasing
 CPPFLAGS += -mavx512f -mavx512dq -mavx512bw -mprefer-vector-width=512
 CPPFLAGS += -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize
 
