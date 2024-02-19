@@ -280,6 +280,7 @@ float av_velocity(const t_param params, t_speed *cells, int *obstacles)
     /* loop over all non-blocked cells */
     for (int jj = 0; jj < params.ny; jj++)
     {
+#pragma clang loop vectorize(enable)
         for (int ii = 0; ii < params.nx; ii++)
         {
             /* ignore occupied cells */
