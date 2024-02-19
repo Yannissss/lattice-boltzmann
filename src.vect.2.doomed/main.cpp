@@ -49,12 +49,12 @@
 ** if you choose a different obstacle file.
 */
 
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <cmath>
-#include <time.h>
-#include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include <driver.hpp>
 #include <kernel.hpp>
@@ -67,15 +67,17 @@
 ** function prototypes
 */
 
-/* load params, allocate memory, load obstacles & initialise fluid particle densities */
-int initialise(const char *paramfile, const char *obstaclefile,
-               t_param *params, t_speed **cells_ptr, t_speed **tmp_cells_ptr,
-               int **obstacles_ptr, float **av_vels_ptr);
+/* load params, allocate memory, load obstacles & initialise fluid particle
+ * densities */
+int initialise(const char *paramfile, const char *obstaclefile, t_param *params,
+               t_speed *cells_ptr, t_speed *tmp_cells_ptr, int **obstacles_ptr,
+               float **av_vels_ptr);
 
-int write_values(const t_param params, t_speed *cells, int *obstacles, float *av_vels);
+int write_values(const t_param params, t_speed cells, int *obstacles,
+                 float *av_vels);
 
 /* finalise, including freeing up allocated memory */
-int finalise(const t_param *params, t_speed **cells_ptr, t_speed **tmp_cells_ptr,
+int finalise(const t_param *params, t_speed *cells_ptr, t_speed *tmp_cells_ptr,
              int **obstacles_ptr, float **av_vels_ptr);
 
 /* utility functions */
@@ -88,15 +90,18 @@ void usage(const char *exe);
 */
 int main(int argc, char *argv[])
 {
-    char *paramfile = NULL;                                                            /* name of the input parameter file */
-    char *obstaclefile = NULL;                                                         /* name of a the input obstacle file */
-    t_param params;                                                                    /* struct to hold parameter values */
-    t_speed *cells = NULL;                                                             /* grid containing fluid densities */
-    t_speed *tmp_cells = NULL;                                                         /* scratch space */
-    int *obstacles = NULL;                                                             /* grid indicating which cells are blocked */
-    float *av_vels = NULL;                                                             /* a record of the av. velocity computed for each timestep */
-    struct timeval timstr;                                                             /* structure to hold elapsed time */
-    double tot_tic, tot_toc, init_tic, init_toc, comp_tic, comp_toc, col_tic, col_toc; /* floating point numbers to calculate elapsed wallclock time */
+    char *paramfile = NULL;    /* name of the input parameter file */
+    char *obstaclefile = NULL; /* name of a the input obstacle file */
+    t_param params;            /* struct to hold parameter values */
+    t_speed cells;             /* grid containing fluid densities */
+    t_speed tmp_cells;         /* scratch space */
+    int *obstacles = NULL;     /* grid indicating which cells are blocked */
+    float *av_vels =
+        NULL; /* a record of the av. velocity computed for each timestep */
+    struct timeval timstr; /* structure to hold elapsed time */
+    double tot_tic, tot_toc, init_tic, init_toc, comp_tic, comp_toc, col_tic,
+        col_toc; /* floating point numbers to calculate elapsed wallclock time
+                  */
 
     /* parse the command line */
     if (argc != 3)
@@ -109,11 +114,13 @@ int main(int argc, char *argv[])
         obstaclefile = argv[2];
     }
 
-    /* Total/init time starts here: initialise our data structures and load values from file */
+    /* Total/init time starts here: initialise our data structures and load
+     * values from file */
     gettimeofday(&timstr, NULL);
     tot_tic = timstr.tv_sec + (timstr.tv_usec / 1000000.0);
     init_tic = tot_tic;
-    initialise(paramfile, obstaclefile, &params, &cells, &tmp_cells, &obstacles, &av_vels);
+    initialise(paramfile, obstaclefile, &params, &cells, &tmp_cells, &obstacles,
+               &av_vels);
 #ifdef DEBUG
     write_values(params, cells, obstacles, av_vels);
 #endif
@@ -141,7 +148,8 @@ int main(int argc, char *argv[])
 
     /* write final values and free memory */
     printf("==done==\n");
-    printf("Reynolds number:\t\t%.12E\n", calc_reynolds(params, cells, obstacles));
+    printf("Reynolds number:\t\t%.12E\n",
+           calc_reynolds(params, cells, obstacles));
     printf("Elapsed Init time:\t\t\t%.6lf (s)\n", init_toc - init_tic);
     printf("Elapsed Compute time:\t\t\t%.6lf (s)\n", comp_toc - comp_tic);
     printf("Elapsed Collate time:\t\t\t%.6lf (s)\n", col_toc - col_tic);
@@ -152,9 +160,9 @@ int main(int argc, char *argv[])
     return EXIT_SUCCESS;
 }
 
-int initialise(const char *paramfile, const char *obstaclefile,
-               t_param *params, t_speed **cells_ptr, t_speed **tmp_cells_ptr,
-               int **obstacles_ptr, float **av_vels_ptr)
+int initialise(const char *paramfile, const char *obstaclefile, t_param *params,
+               t_speed *cells_ptr, t_speed *tmp_cells_ptr, int **obstacles_ptr,
+               float **av_vels_ptr)
 {
     char message[1024]; /* message buffer */
     FILE *fp;           /* file pointer */
@@ -229,17 +237,29 @@ int initialise(const char *paramfile, const char *obstaclefile,
     ** a 1D array of these structs.
     */
 
-    /* main grid */
-    *cells_ptr = (t_speed *)malloc(sizeof(t_speed) * (params->ny * params->nx));
+    float *ptr = NULL;
 
-    if (*cells_ptr == NULL)
-        die("cannot allocate memory for cells", __LINE__, __FILE__);
+    /* main grid */
+    for (int kk = 0; kk < NSPEEDS; kk++)
+    {
+        ptr = (float *)malloc(sizeof(float) * (params->ny * params->nx));
+
+        if (ptr == NULL)
+            die("cannot allocate memory for cells", __LINE__, __FILE__);
+
+        cells_ptr->speeds[kk] = ptr;
+    }
 
     /* 'helper' grid, used as scratch space */
-    *tmp_cells_ptr = (t_speed *)malloc(sizeof(t_speed) * (params->ny * params->nx));
+    for (int kk = 0; kk < NSPEEDS; kk++)
+    {
+        ptr = (float *)malloc(sizeof(float) * (params->ny * params->nx));
 
-    if (*tmp_cells_ptr == NULL)
-        die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
+        if (ptr == NULL)
+            die("cannot allocate memory for tmp_cells", __LINE__, __FILE__);
+
+        tmp_cells_ptr->speeds[kk] = ptr;
+    }
 
     /* the map of obstacles */
     *obstacles_ptr = (int *)malloc(sizeof(int) * (params->ny * params->nx));
@@ -257,17 +277,17 @@ int initialise(const char *paramfile, const char *obstaclefile,
         for (int ii = 0; ii < params->nx; ii++)
         {
             /* centre */
-            (*cells_ptr)[ii + jj * params->nx].speeds[0] = w0;
+            cells_ptr->speeds[0][ii + jj * params->nx] = w0;
             /* axis directions */
-            (*cells_ptr)[ii + jj * params->nx].speeds[1] = w1;
-            (*cells_ptr)[ii + jj * params->nx].speeds[2] = w1;
-            (*cells_ptr)[ii + jj * params->nx].speeds[3] = w1;
-            (*cells_ptr)[ii + jj * params->nx].speeds[4] = w1;
+            cells_ptr->speeds[1][ii + jj * params->nx] = w1;
+            cells_ptr->speeds[2][ii + jj * params->nx] = w1;
+            cells_ptr->speeds[3][ii + jj * params->nx] = w1;
+            cells_ptr->speeds[4][ii + jj * params->nx] = w1;
             /* diagonals */
-            (*cells_ptr)[ii + jj * params->nx].speeds[5] = w2;
-            (*cells_ptr)[ii + jj * params->nx].speeds[6] = w2;
-            (*cells_ptr)[ii + jj * params->nx].speeds[7] = w2;
-            (*cells_ptr)[ii + jj * params->nx].speeds[8] = w2;
+            cells_ptr->speeds[5][ii + jj * params->nx] = w2;
+            cells_ptr->speeds[6][ii + jj * params->nx] = w2;
+            cells_ptr->speeds[7][ii + jj * params->nx] = w2;
+            cells_ptr->speeds[8][ii + jj * params->nx] = w2;
         }
     }
 
@@ -285,7 +305,8 @@ int initialise(const char *paramfile, const char *obstaclefile,
 
     if (fp == NULL)
     {
-        sprintf(message, "could not open input obstacles file: %s", obstaclefile);
+        sprintf(message, "could not open input obstacles file: %s",
+                obstaclefile);
         die(message, __LINE__, __FILE__);
     }
 
@@ -294,7 +315,8 @@ int initialise(const char *paramfile, const char *obstaclefile,
     {
         /* some checks */
         if (retval != 3)
-            die("expected 3 values per line in obstacle file", __LINE__, __FILE__);
+            die("expected 3 values per line in obstacle file", __LINE__,
+                __FILE__);
 
         if (xx < 0 || xx > params->nx - 1)
             die("obstacle x-coord out of range", __LINE__, __FILE__);
@@ -321,17 +343,20 @@ int initialise(const char *paramfile, const char *obstaclefile,
     return EXIT_SUCCESS;
 }
 
-int finalise(const t_param *params, t_speed **cells_ptr, t_speed **tmp_cells_ptr,
+int finalise(const t_param *params, t_speed *cells_ptr, t_speed *tmp_cells_ptr,
              int **obstacles_ptr, float **av_vels_ptr)
 {
     /*
     ** free up allocated memory
     */
-    free(*cells_ptr);
-    *cells_ptr = NULL;
+    for (int kk = 0; kk < NSPEEDS; kk++)
+    {
+        free(cells_ptr->speeds[kk]);
+        cells_ptr->speeds[kk] = NULL;
 
-    free(*tmp_cells_ptr);
-    *tmp_cells_ptr = NULL;
+        free(tmp_cells_ptr->speeds[kk]);
+        tmp_cells_ptr->speeds[kk] = NULL;
+    }
 
     free(*obstacles_ptr);
     *obstacles_ptr = NULL;
@@ -342,7 +367,8 @@ int finalise(const t_param *params, t_speed **cells_ptr, t_speed **tmp_cells_ptr
     return EXIT_SUCCESS;
 }
 
-int write_values(const t_param params, t_speed *cells, int *obstacles, float *av_vels)
+int write_values(const t_param params, t_speed cells, int *obstacles,
+                 float *av_vels)
 {
     FILE *fp;                     /* file pointer */
     const float c_sq = 1.f / 3.f; /* sq. of speed of sound */
@@ -350,7 +376,7 @@ int write_values(const t_param params, t_speed *cells, int *obstacles, float *av
     float pressure;               /* fluid pressure in grid cell */
     float u_x;                    /* x-component of velocity in grid cell */
     float u_y;                    /* y-component of velocity in grid cell */
-    float u;                      /* norm--root of summed squares--of u_x and u_y */
+    float u; /* norm--root of summed squares--of u_x and u_y */
 
 #ifdef DEBUG
     /* Hack degueux pour créer une image initiale si build en mode debug */
@@ -386,13 +412,25 @@ int write_values(const t_param params, t_speed *cells, int *obstacles, float *av
 
                 for (int kk = 0; kk < NSPEEDS; kk++)
                 {
-                    local_density += cells[ii + jj * params.nx].speeds[kk];
+                    local_density += cells.speeds[kk][ii + jj * params.nx];
                 }
 
                 /* compute x velocity component */
-                u_x = (cells[ii + jj * params.nx].speeds[1] + cells[ii + jj * params.nx].speeds[5] + cells[ii + jj * params.nx].speeds[8] - (cells[ii + jj * params.nx].speeds[3] + cells[ii + jj * params.nx].speeds[6] + cells[ii + jj * params.nx].speeds[7])) / local_density;
+                u_x = (cells.speeds[1][ii + jj * params.nx] +
+                       cells.speeds[5][ii + jj * params.nx] +
+                       cells.speeds[8][ii + jj * params.nx] -
+                       (cells.speeds[3][ii + jj * params.nx] +
+                        cells.speeds[6][ii + jj * params.nx] +
+                        cells.speeds[7][ii + jj * params.nx])) /
+                      local_density;
                 /* compute y velocity component */
-                u_y = (cells[ii + jj * params.nx].speeds[2] + cells[ii + jj * params.nx].speeds[5] + cells[ii + jj * params.nx].speeds[6] - (cells[ii + jj * params.nx].speeds[4] + cells[ii + jj * params.nx].speeds[7] + cells[ii + jj * params.nx].speeds[8])) / local_density;
+                u_y = (cells.speeds[2][ii + jj * params.nx] +
+                       cells.speeds[5][ii + jj * params.nx] +
+                       cells.speeds[6][ii + jj * params.nx] -
+                       (cells.speeds[4][ii + jj * params.nx] +
+                        cells.speeds[7][ii + jj * params.nx] +
+                        cells.speeds[8][ii + jj * params.nx])) /
+                      local_density;
                 /* compute norm of velocity */
                 u = sqrtf((u_x * u_x) + (u_y * u_y));
                 /* compute pressure */
@@ -400,7 +438,8 @@ int write_values(const t_param params, t_speed *cells, int *obstacles, float *av
             }
 
             /* write to file */
-            fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y, u, pressure, obstacles[ii + params.nx * jj]);
+            fprintf(fp, "%d %d %.12E %.12E %.12E %.12E %d\n", ii, jj, u_x, u_y,
+                    u, pressure, obstacles[ii + params.nx * jj]);
         }
     }
 
