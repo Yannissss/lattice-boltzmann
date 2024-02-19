@@ -19,6 +19,7 @@ int accelerate_flow(const t_param params, t_speed *cells, int *obstacles)
     /* modify the 2nd row of the grid */
     int jj = params.ny - 2;
 
+#pragma clang loop vectorize(enable)
     for (int ii = 0; ii < params.nx; ii++)
     {
         /* if the cell is not occupied and
