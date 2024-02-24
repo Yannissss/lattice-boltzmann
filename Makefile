@@ -12,7 +12,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CPPFLAGS  = $(INC_FLAGS) -MMD -MP
 CPPFLAGS += -DNDEBUG
-CPPFLAGS += -std=c++2b -Wall -g
+CPPFLAGS += -std=c++20 -Wall -g
 
 # Clang setup
 # CXX       = clang
@@ -21,11 +21,16 @@ CPPFLAGS += -std=c++2b -Wall -g
 
 # Intel setup
 CXX       = icpx
-CPPFLAGS += -O3 -fp-model=fast -march=native -fno-strict-aliasing
-CPPFLAGS += -mavx512f -mavx512dq -mavx512bw -mprefer-vector-width=512
-CPPFLAGS += -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize
+CPPFLAGS += -Ofast -march=native -fno-strict-aliasing
+CPPFLAGS += -mavx512f -mavx512dq -mavx512bw
+CPPFLAGS += -mprefer-vector-width=512
+#CPPFLAGS += -Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize
 
 LDFLAGS   = -lm
+
+# MPI vars
+MPI_CXX_FLAGS = -I/opt/mpi/openmpi/4.1.4.2/include -I/opt/mpi/openmpi/4.1.4.2/fortran-intel-ilp64/include -g -m64
+MPI_LD_FLAGS  = -g -m64 -L/usr/lib64 -L/opt/mpi/openmpi/4.1.4.2/lib -L/opt/mpi/openmpi/4.1.4.2/fortran-intel-ilp64/lib -lmpi
 
 FINAL_STATE_FILE      = ./final_state.dat
 AV_VELS_FILE          = ./av_vels.dat
@@ -38,15 +43,15 @@ run: $(TARGET)
 	@./run
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CPPFLAGS) $(OBJS) -o $@ $(LDFLAGS)
+	$(CXX) $(CPPFLAGS) $(OBJS) -o $@ $(LDFLAGS) $(MPI_LD_FLAGS)
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(MKDIR_P) $(dir $@)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@ $(MPI_CXX_FLAGS)
 
 check:
-	python check/check.py --ref-av-vels-file=$(REF_AV_VELS_FILE) --ref-final-state-file=$(REF_FINAL_STATE_FILE) --av-vels-file=$(AV_VELS_FILE) --final-state-file=$(FINAL_STATE_FILE)
+	python3 check/check.py --ref-av-vels-file=$(REF_AV_VELS_FILE) --ref-final-state-file=$(REF_FINAL_STATE_FILE) --av-vels-file=$(AV_VELS_FILE) --final-state-file=$(FINAL_STATE_FILE)
 
 .PHONY: all check clean
 

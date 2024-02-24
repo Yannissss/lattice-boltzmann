@@ -12,6 +12,9 @@
 revision, params, time, comments
 orig, 128x128, 23.673115, Original version ; no changes
 base, 128x128, 13.589240, Makefile modification : -march=native
+alpha, 128x128, 11.665537, Manual optimizations
+
+
 av, 128x128, ??, timestep inline ; av_velocity vectorization
 refa, 128x128, 14.027232, inline ; constexpr some stuff ; loop unrolling 
 vect, 128x128, 0.0, AoS => SoA to allow vectorization
