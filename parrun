@@ -6,4 +6,7 @@ input="input_${n}x${n}.params"
 obst="obstacles_${n}x${n}.dat"
 cmd="$exec $input $obst"
 echo $cmd
-sh -c "$cmd"
+mpirun -np 2 \
+    --mca btl bxi \
+    --mca mpi_common_adge_warning 0 \
+    $exec $input $obst

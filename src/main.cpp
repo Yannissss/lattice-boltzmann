@@ -58,8 +58,7 @@
 
 #include <driver.hpp>
 #include <kernel.hpp>
-
-#include <mpi.h>
+#include <memory.hpp>
 
 #define FINALSTATEFILE "final_state.dat"
 #define INITIALSTATEFILE "initial_state.dat"
@@ -104,6 +103,8 @@ int main(int argc, char *argv[])
     double tot_tic, tot_toc, init_tic, init_toc, comp_tic, comp_toc, col_tic,
         col_toc; /* floating point numbers to calculate elapsed wallclock time
                   */
+
+    MPI_guard mpi_guard(&argc, &argv); /* MPI initialization & deleting guard */
 
     /* parse the command line */
     if (argc != 3)
